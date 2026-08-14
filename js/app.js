@@ -41,15 +41,16 @@ const cartCount = document.getElementById("cartCount");
    INITIALIZE APPLICATION
    ========================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   updateCartCount();
 
   setupSearch();
   setupCartButton();
 
   renderCategories();
-  renderProducts();
 
+  await initializeDatabase();
+});
   /*
    * Products will be loaded from Firestore
    * after Firebase configuration is added.

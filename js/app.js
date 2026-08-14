@@ -51,12 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await initializeDatabase();
 });
-  /*
-   * Products will be loaded from Firestore
-   * after Firebase configuration is added.
-   */
-});
-
 
 /* =========================================
    LOCAL STORAGE - CART

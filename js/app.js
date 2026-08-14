@@ -654,31 +654,25 @@ function showMessage(message) {
  */
 
 async function loadProductsFromDatabase() {
-
-  /*
-   * Firebase Firestore connection will be
-   * implemented in the Firebase stage.
-   */
-
   try {
+    const productsSnapshot = await getDocs(
+      collection(db, "products")
+    );
 
-    /*
-     * Example structure expected from Firestore:
-     *
-     * {
-     *   id: "product-id",
-     *   name: "Product name",
-     *   price: 500,
-     *   imageUrl: "...",
-     *   categoryId: "category-id",
-     *   categoryName: "Category"
-     * }
-     */
+    const products = [];
 
-    return [];
+    productsSnapshot.forEach((doc) => {
+      products.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    console.log("Products loaded:", products);
+
+    return products;
 
   } catch (error) {
-
     console.error(
       "Product database loading failed:",
       error
@@ -686,7 +680,7 @@ async function loadProductsFromDatabase() {
 
     return [];
   }
-}
+   }
 
 
 /* =========================================

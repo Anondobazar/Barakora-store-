@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>কার্ট | Barakora</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #172033;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .logo {
+      color: #117c72;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .back {
+      color: #117c72;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 5px;
+    }
+
+    .box {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .item-price {
+      color: #117c72;
+      font-weight: bold;
+    }
+
+    .remove-btn {
+      border: none;
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 8px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .total {
+      text-align: right;
+      font-size: 21px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      margin-top: 7px;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .cod-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #d1d5db;
+      padding: 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .cod-option input {
+      width: auto;
+      margin: 0;
+    }
+
+    .order-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #117c72;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      color: #777;
+    }
+
+    .cod-note {
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Barakora</div>
+  <a href="index.html" class="back">← শপিং চালিয়ে যান</a>
+</header>
+
+<main>
+
+  <h1>আপনার কার্ট</h1>
+
+  <div class="box">
+    <div id="cartItems"></div>
+
+    <div class="total">
+      মোট: ৳<span id="total">0</span>
+    </div>
+  </div>
+
+  <div class="box">
+
+    <h2>ডেলিভারি তথ্য</h2>
+
+    <label>
+      নাম
+      <input
+        id="customerName"
+        type="text"
+        placeholder="আপনার নাম">
+    </label>
+
+    <label>
+      মোবাইল নম্বর
+      <input
+        id="customerPhone"
+        type="tel"
+        placeholder="01XXXXXXXXX">
+    </label>
+
+    <label>
+      সম্পূর্ণ ঠিকানা
+      <textarea
+        id="customerAddress"
+        placeholder="আপনার সম্পূর্ণ ডেলিভারি ঠিকানা"></textarea>
+    </label>
+
+  </div>
+
+  <div class="box">
+
+    <h2>পেমেন্ট পদ্ধতি</h2>
+
+    <label class="cod-option">
+      <input
+        type="radio"
+        name="payment"
+        value="cash_on_delivery"
+        checked>
+
+      <span>
+        💵 ক্যাশ অন ডেলিভারি
+      </span>
+    </label>
+
+    <div class="cod-note">
+      পণ্য হাতে পাওয়ার সময় ডেলিভারি কর্মীকে টাকা পরিশোধ করবেন।
+    </div>
+
+  </div>
+
+  <button
+    class="order-btn"
+    onclick="placeOrder()">
+
+    অর্ডার কনফার্ম করুন
+
+  </button>
+
+</main>
+
+<script>
+
+"use strict";
+
+
+function getCart() {
+
+  try {
+
+    const saved =
+      localStorage.getItem("barakora_cart");
+
+    if (!saved) {
+      return [];
+    }
+
+    const cart = JSON.parse(saved);
+
+    return Array.isArray(cart)
+      ? cart
+      : [];
+
+  } catch (error) {
+
+    console.error(
+      "Cart loading failed:",
+      error
+    );
+
+    return [];
+  }
+}
+
+
+function saveCart(cart) {
+
+  localStorage.setItem(
+    "barakora_cart",
+    JSON.stringify(cart)
+  );
+}
+
+
+function escapeHtml(value) {
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function renderCart() {
+
+  const cart = getCart();
+
+  const container =
+    document.getElementById("cartItems");
+
+  const totalElement =
+    document.getElementById("total");
+
+  if (!cart.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        🛒 আপনার কার্ট খালি।
+        <br><br>
+        <a href="index.html">
+          পণ্য দেখতে ফিরে যান
+        </a>
+      </div>
+    `;
+
+    totalElement.textContent = "0";
+
+    return;
+  }
+
+
+  let total = 0;
+
+
+  container.innerHTML =
+    cart.map((item, index) => {
+
+      const price =
+        Number(item.price) || 0;
+
+      const quantity =
+        Number(item.quantity) || 1;
+
+      total += price * quantity;
+
+
+      return `
+        <div class="cart-item">
+
+          <div>
+
+            <div class="item-name">
+              ${escapeHtml(item.name || "পণ্য")}
+            </div>
+
+            <div>
+              পরিমাণ: ${quantity}
+            </div>
+
+            <div class="item-price">
+              ৳${price.toLocaleString("bn-BD")}
+            </div>
+
+          </div>
+
+          <button
+            class="remove-btn"
+            onclick="removeItem(${index})">
+
+            বাদ দিন
+
+          </button>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  totalElement.textContent =
+    total.toLocaleString("bn-BD");
+}
+
+
+function removeItem(index) {
+
+  const cart = getCart();
+
+  if (!cart[index]) {
+    return;
+  }
+
+  cart.splice(index, 1);
+
+  saveCart(cart);
+
+  renderCart();
+}
+
+
+function placeOrder() {
+
+  const cart = getCart();
+
+  if (!cart.length) {
+
+    alert(
+      "আপনার কার্ট খালি।"
+    );
+
+    return;
+  }
+
+
+  const name =
+    document
+      .getElementById("customerName")
+      .value
+      .trim();
+
+
+  const phone =
+    document
+      .getElementById("customerPhone")
+      .value
+      .trim();
+
+
+  const address =
+    document
+      .getElementById("customerAddress")
+      .value
+      .trim();
+
+
+  if (!name) {
+
+    alert("আপনার নাম লিখুন।");
+
+    return;
+  }
+
+
+  if (!phone) {
+
+    alert(
+      "আপনার মোবাইল নম্বর লিখুন।"
+    );
+
+    return;
+  }
+
+
+  if (!address) {
+
+    alert(
+      "আপনার সম্পূর্ণ ঠিকানা লিখুন।"
+    );
+
+    return;
+  }
+
+
+  let total = 0;
+
+
+  cart.forEach(item => {
+
+    const price =
+      Number(item.price) || 0;
+
+    const quantity =
+      Number(item.quantity) || 1;
+
+    total += price * quantity;
+
+  });
+
+
+  const order = {
+
+    customer: {
+
+      name: name,
+
+      phone: phone,
+
+      address: address
+
+    },
+
+    items: cart,
+
+    total: total,
+
+    paymentMethod:
+      "cash_on_delivery",
+
+    paymentStatus:
+      "pending",
+
+    orderStatus:
+      "pending",
+
+    createdAt:
+      new Date().toISOString()
+
+  };
+
+
+  console.log(
+    "Order ready:",
+    order
+  );
+
+
+  alert(
+    "অর্ডার তথ্য প্রস্তুত হয়েছে।\n\n" +
+    "পেমেন্ট: ক্যাশ অন ডেলিভারি\n" +
+    "মোট: ৳" +
+    total.toLocaleString("bn-BD") +
+    "\n\n" +
+    "পরবর্তী ধাপে এই অর্ডারটি Firebase-এ সংরক্ষণ করা হবে।"
+  );
+
+}
+
+
+renderCart();
+
+</script>
+
+</body>
+</html>

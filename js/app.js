@@ -647,7 +647,30 @@ function showMessage(message) {
  * the Firebase configuration/module files
  * are added.
  */
+async function loadCategoriesFromDatabase() {
+  try {
+    const categoriesSnapshot = await getDocs(
+      collection(db, "categories")
+    );
 
+    const categories = [];
+
+    categoriesSnapshot.forEach((doc) => {
+      categories.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    console.log("Categories loaded:", categories);
+
+    return categories;
+
+  } catch (error) {
+    console.error("Category database loading failed:", error);
+    return [];
+  }
+}
 async function loadProductsFromDatabase() {
   try {
     const productsSnapshot = await getDocs(
@@ -681,24 +704,22 @@ async function loadProductsFromDatabase() {
 /* =========================================
    DATABASE INITIALIZATION
    ========================================= */
-
 async function initializeDatabase() {
+  const categories = await loadCategoriesFromDatabase();
 
-  const products =
-    await loadProductsFromDatabase();
-
-
-  if (Array.isArray(products)) {
-
-    state.products =
-      products;
-
+  if (Array.isArray(categories)) {
+    state.categories = categories;
   }
 
+  const products = await loadProductsFromDatabase();
 
+  if (Array.isArray(products)) {
+    state.products = products;
+  }
+
+  renderCategories();
   renderProducts();
-}
-
+                              }
 
 /* =========================================
    PUBLIC APP API
